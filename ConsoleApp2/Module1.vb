@@ -88,7 +88,6 @@
     End Sub
 
     Sub getCmdParam()
-        '
         Console.WriteLine(System.Environment.CommandLine) 'コマンドライン引数を表示する
         Dim cmds As String() = System.Environment.GetCommandLineArgs() 'コマンドライン引数を配列で取得する
         Dim cmd As String 'コマンドライン引数を列挙する

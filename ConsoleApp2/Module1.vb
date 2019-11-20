@@ -1,6 +1,6 @@
 ﻿Module Module1
 
-    Dim csv As String = "D:\Users\z112\source\repos\ConsoleApp2\stock_info.csv"
+    Dim csv As String = "D:\Users\z112\source\repos\ConsoleApp2\stock_data\9107_2019.csv"
     'Dim csv As String = "C:\Users\r2d2\Downloads\git_test\chart_analytics\9101_2019.csv"
 
     Sub Main()
@@ -11,13 +11,9 @@
         }
 
         Dim Prices As New ActiveMarket.Prices
-        Prices.Read(securitiesCodes(0))
+        Prices.Read(securitiesCodes(2))
 
         Dim Calendar As New ActiveMarket.Calendar
-
-        '9104 東証1部 (株)商船三井（海運業）,,,,,
-        '"date","open","hight","low","close","power","end"
-        '"2019-01-04","2300","2334","2251","2318","1113300","2318"
 
         Dim hash As New Hashtable
         Dim date_position As Integer
@@ -44,36 +40,26 @@
 
         Try
         Catch ex As Exception
-
         End Try
 
-        hash.Add("9101", Prices.Name)
-
-
-        'System.Diagnostics.Trace.WriteLine("test trace messate !!!")
-        'System.Diagnostics.Debug.WriteLine(Prices.Name)
-
-        'For Each a As String In arr
-        '    System.Diagnostics.Debug.WriteLine(a)
-        'Next
-
-        Dim output As String
-        output = CType(securitiesCodes(0), String) + " " + Prices.Name + ",,,,," + vbCrLf _
-                + """date"",""open"",""hight"",""low"",""close"",""power"",""End"""
+        hash.Add(securitiesCodes(2), Prices.Name)
 
         'ファイル削除
         System.IO.File.Delete(csv)
-        outputCsv(output)
 
+        'csvヘッダー表示
+        outputCsv(CType(securitiesCodes(0), String) + " " + Prices.Name + ",,,,," + vbCrLf _
+                + """date"",""open"",""hight"",""low"",""close"",""power"",""End""")
+
+        Dim output As String
         For i = 0 To date_range
             If IsNothing(stock_array(i, 0)) Then
                 Continue For
             End If
-            '9101,,,,,
-            '"date","open","hight","low","close","power","end"
+
             output = """" + stock_array(i, 0) + """,""" + stock_array(i, 1) + """,""" + stock_array(i, 2) + """,""" + stock_array(i, 3) _
                  + """,""" + stock_array(i, 4) + """,""" + stock_array(i, 5) + """,""" + stock_array(i, 6) + """"
-            System.Diagnostics.Debug.WriteLine(output)
+            'System.Diagnostics.Debug.WriteLine(output)
             outputCsv(output)
         Next
 

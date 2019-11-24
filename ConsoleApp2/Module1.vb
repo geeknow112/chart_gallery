@@ -44,7 +44,7 @@
 
             hash.Add(securitiesCodes(securitiesCode), Prices.Name)
 
-            csvFile = csvPath + Ctype(securitiesCodes(securitiesCode), String) + "_2019.csv"
+            csvFile = csvPath + CType(securitiesCodes(securitiesCode), String) + "_2019.csv"
 
             'ファイル削除
             System.IO.File.Delete(csvFile)

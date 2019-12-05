@@ -4,6 +4,9 @@
     Dim csvPath As String = "C:\Users\r2d2\source\repos\chart_gallery\stock_data\"
 
     Sub Main()
+        'makeZip()
+        'Exit Sub
+
         'getCmdParam()
 
         Dim securitiesCodes() As Integer = {
@@ -82,6 +85,11 @@
         For Each cmd In cmds
             Console.WriteLine(cmd)
         Next
+    End Sub
+
+    Sub makeZip()
+        'ZIP書庫を作成
+        System.IO.Compression.ZipFile.CreateFromDirectory("C:\temp\test\dir", "C:\temp\test\1.zip", System.IO.Compression.CompressionLevel.Optimal, False, System.Text.Encoding.GetEncoding("shift_jis"))
     End Sub
 
 End Module

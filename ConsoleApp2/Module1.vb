@@ -1,87 +1,78 @@
 ﻿Module Module1
 
-    'Dim csv As String = "D:\Users\z112\source\repos\ConsoleApp2\stock_info.csv"
-    Dim csv As String = "C:\Users\r2d2\Downloads\git_test\chart_analytics\9101_2019.csv"
+    'Dim csvPath As String = "D:\Users\z112\source\repos\ConsoleApp2\stock_data\"
+    Dim csvPath As String = "C:\Users\r2d2\source\repos\chart_gallery\stock_data\"
 
     Sub Main()
+        'makeZip()
+        'Exit Sub
+
         'getCmdParam()
 
         Dim securitiesCodes() As Integer = {
-            9101, 9104, 9107
+            9101, 9104, 9107, 9984
         }
 
         Dim Prices As New ActiveMarket.Prices
-        Prices.Read(securitiesCodes(0))
-
         Dim Calendar As New ActiveMarket.Calendar
-
-        '9104 東証1部 (株)商船三井（海運業）,,,,,
-        '"date","open","hight","low","close","power","end"
-        '"2019-01-04","2300","2334","2251","2318","1113300","2318"
-
         Dim hash As New Hashtable
         Dim date_position As Integer
         Dim date_range As Integer
-
-        date_position = 7900
-        date_range = Prices.End - date_position
-
-        Dim stock_array(date_range, 7) As String
-
-        For i = 0 To date_range - 1
-            date_position = date_position + 1
-            If Prices.IsClosed(date_position) Then
-                Continue For
-            End If
-            stock_array(i, 0) = Format(Calendar.Date(date_position), "yyyy-MM-dd")
-            stock_array(i, 1) = Prices.Open(date_position)
-            stock_array(i, 2) = Prices.High(date_position)
-            stock_array(i, 3) = Prices.Low(date_position)
-            stock_array(i, 4) = Prices.Close(date_position)
-            stock_array(i, 5) = Math.Floor(Prices.Volume(date_position) * 1000)
-            stock_array(i, 6) = Prices.Close(date_position)
-        Next
-
-        Try
-        Catch ex As Exception
-
-        End Try
-
-        hash.Add("9101", Prices.Name)
-
-
-        'System.Diagnostics.Trace.WriteLine("test trace messate !!!")
-        'System.Diagnostics.Debug.WriteLine(Prices.Name)
-
-        'For Each a As String In arr
-        '    System.Diagnostics.Debug.WriteLine(a)
-        'Next
-
         Dim output As String
-        output = CType(securitiesCodes(0), String) + " " + Prices.Name + ",,,,," + vbCrLf _
-                + """date"",""open"",""hight"",""low"",""close"",""power"",""End"""
+        Dim csvFile As String
 
-        'ファイル削除
-        System.IO.File.Delete(csv)
-        outputCsv(output)
+        For securitiesCode = 0 To UBound(securitiesCodes)
+            Prices.Read(securitiesCodes(securitiesCode))
+            date_position = 7900
+            date_range = Prices.End - date_position
+            Dim stock_array(date_range, 7) As String
 
-        For i = 0 To date_range
-            If IsNothing(stock_array(i, 0)) Then
-                Continue For
-            End If
-            '9101,,,,,
-            '"date","open","hight","low","close","power","end"
-            output = """" + stock_array(i, 0) + """,""" + stock_array(i, 1) + """,""" + stock_array(i, 2) + """,""" + stock_array(i, 3) _
-                 + """,""" + stock_array(i, 4) + """,""" + stock_array(i, 5) + """,""" + stock_array(i, 6) + """"
-            System.Diagnostics.Debug.WriteLine(output)
-            outputCsv(output)
+            For i = 0 To date_range - 1
+                date_position = date_position + 1
+                If Prices.IsClosed(date_position) Then
+                    Continue For
+                End If
+                stock_array(i, 0) = Format(Calendar.Date(date_position), "yyyy-MM-dd")
+                stock_array(i, 1) = Prices.Open(date_position)
+                stock_array(i, 2) = Prices.High(date_position)
+                stock_array(i, 3) = Prices.Low(date_position)
+                stock_array(i, 4) = Prices.Close(date_position)
+                stock_array(i, 5) = Math.Floor(Prices.Volume(date_position) * 1000)
+                stock_array(i, 6) = Prices.Close(date_position)
+            Next
+
+            Try
+            Catch ex As Exception
+            End Try
+
+            hash.Add(securitiesCodes(securitiesCode), Prices.Name)
+
+            csvFile = csvPath + CType(securitiesCodes(securitiesCode), String) + "_2019.csv"
+
+            'ファイル削除
+            System.IO.File.Delete(csvFile)
+
+            'csvヘッダー表示
+            outputCsv(CType(securitiesCodes(securitiesCode), String) + " " + Prices.Name + ",,,,," + vbCrLf _
+                    + """date"",""open"",""hight"",""low"",""close"",""power"",""End""", csvFile)
+
+            For i = 0 To date_range
+                If IsNothing(stock_array(i, 0)) Then
+                    Continue For
+                End If
+
+                output = """" + stock_array(i, 0) + """,""" + stock_array(i, 1) + """,""" + stock_array(i, 2) + """,""" + stock_array(i, 3) _
+                     + """,""" + stock_array(i, 4) + """,""" + stock_array(i, 5) + """,""" + stock_array(i, 6) + """"
+                'System.Diagnostics.Debug.WriteLine(output)
+                outputCsv(output, csvFile)
+            Next
         Next
 
     End Sub
 
-    Sub outputCsv(output)
+    Sub outputCsv(output, csvFile)
         Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS") 'CSVファイルのエンコードを指定（今回はShift_JIS）
-        Dim sr As New System.IO.StreamWriter(csv, True, enc) '書き込むファイルを開く
+        Dim sr As New System.IO.StreamWriter(csvFile, True, enc) '書き込むファイルを開く
         sr.Write(output)
         sr.Write(vbCrLf) '改行
         sr.Close()
@@ -94,6 +85,11 @@
         For Each cmd In cmds
             Console.WriteLine(cmd)
         Next
+    End Sub
+
+    Sub makeZip()
+        'ZIP書庫を作成
+        System.IO.Compression.ZipFile.CreateFromDirectory("C:\temp\test\dir", "C:\temp\test\1.zip", System.IO.Compression.CompressionLevel.Optimal, False, System.Text.Encoding.GetEncoding("shift_jis"))
     End Sub
 
 End Module

@@ -10,7 +10,7 @@
         'getCmdParam()
 
         Dim securitiesCodes() As Integer = {
-            9101
+            9101, 7186
         }
         'Dim securitiesCodes() As Integer = {
         '    9101, 9104, 9107, '海運業
@@ -48,6 +48,8 @@
             'ファイル削除
             'System.IO.File.Delete(csvFile)
 
+            Prices.Read(securitiesCodes(securitiesCode))
+
             'csvファイル存在確認
             If System.IO.File.Exists(csvFile) Then
                 '存在したら最終行(改行を含まず)のdate_positionの数値を取得
@@ -73,7 +75,6 @@
                     + """date"",""open"",""hight"",""low"",""close"",""power"",""End"",""date_position""", csvFile)
             End If
 
-            Prices.Read(securitiesCodes(securitiesCode))
             date_range = Prices.End - date_position
             Dim stock_array(date_range, 7) As String
 
@@ -84,12 +85,12 @@
                 End If
 
                 stock_array(i, 0) = Format(Calendar.Date(date_position), "yyyy-MM-dd")
-                stock_array(i, 1) = Prices.Open(date_position)
-                stock_array(i, 2) = Prices.High(date_position)
-                stock_array(i, 3) = Prices.Low(date_position)
-                stock_array(i, 4) = Prices.Close(date_position)
+                stock_array(i, 1) = Math.Floor(Prices.Open(date_position))
+                stock_array(i, 2) = Math.Floor(Prices.High(date_position))
+                stock_array(i, 3) = Math.Floor(Prices.Low(date_position))
+                stock_array(i, 4) = Math.Floor(Prices.Close(date_position))
                 stock_array(i, 5) = Math.Floor(Prices.Volume(date_position) * 1000)
-                stock_array(i, 6) = Prices.Close(date_position)
+                stock_array(i, 6) = Math.Floor(Prices.Close(date_position))
                 stock_array(i, 7) = date_position
             Next
 

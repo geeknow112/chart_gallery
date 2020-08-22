@@ -10,7 +10,7 @@
         'getCmdParam()
 
         Dim securitiesCodes() As Integer = {
-            9101, 9104, 9107, 9984
+            9101
         }
 
         Dim Prices As New ActiveMarket.Prices
@@ -23,7 +23,7 @@
 
         For securitiesCode = 0 To UBound(securitiesCodes)
             Prices.Read(securitiesCodes(securitiesCode))
-            date_position = 7900
+            date_position = 7900 'Price.Begin() '5632
             date_range = Prices.End - date_position
             Dim stock_array(date_range, 7) As String
 
@@ -39,6 +39,7 @@
                 stock_array(i, 4) = Prices.Close(date_position)
                 stock_array(i, 5) = Math.Floor(Prices.Volume(date_position) * 1000)
                 stock_array(i, 6) = Prices.Close(date_position)
+                stock_array(i, 7) = date_position
             Next
 
             Try
@@ -47,14 +48,14 @@
 
             hash.Add(securitiesCodes(securitiesCode), Prices.Name)
 
-            csvFile = csvPath + CType(securitiesCodes(securitiesCode), String) + "_2019.csv"
+            csvFile = csvPath + CType(securitiesCodes(securitiesCode), String) + ".csv"
 
             'ファイル削除
             System.IO.File.Delete(csvFile)
 
             'csvヘッダー表示
             outputCsv(CType(securitiesCodes(securitiesCode), String) + " " + Prices.Name + ",,,,," + vbCrLf _
-                    + """date"",""open"",""hight"",""low"",""close"",""power"",""End""", csvFile)
+                    + """date"",""open"",""hight"",""low"",""close"",""power"",""End"",""date_position""", csvFile)
 
             For i = 0 To date_range
                 If IsNothing(stock_array(i, 0)) Then
@@ -62,7 +63,7 @@
                 End If
 
                 output = """" + stock_array(i, 0) + """,""" + stock_array(i, 1) + """,""" + stock_array(i, 2) + """,""" + stock_array(i, 3) _
-                     + """,""" + stock_array(i, 4) + """,""" + stock_array(i, 5) + """,""" + stock_array(i, 6) + """"
+                     + """,""" + stock_array(i, 4) + """,""" + stock_array(i, 5) + """,""" + stock_array(i, 6) + """,""" + stock_array(i, 7) + """"
                 'System.Diagnostics.Debug.WriteLine(output)
                 outputCsv(output, csvFile)
             Next
@@ -89,7 +90,7 @@
 
     Sub makeZip()
         'ZIP書庫を作成
-        System.IO.Compression.ZipFile.CreateFromDirectory("C:\temp\test\dir", "C:\temp\test\1.zip", System.IO.Compression.CompressionLevel.Optimal, False, System.Text.Encoding.GetEncoding("shift_jis"))
+        'System.IO.Compression.ZipFile.CreateFromDirectory("C:\temp\test\dir", "C:\temp\test\1.zip", System.IO.Compression.CompressionLevel.Optimal, False, System.Text.Encoding.GetEncoding("shift_jis"))
     End Sub
 
 End Module

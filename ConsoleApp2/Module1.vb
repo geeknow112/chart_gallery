@@ -44,8 +44,36 @@
         Dim csvFile As String
 
         For securitiesCode = 0 To UBound(securitiesCodes)
+            csvFile = csvPath + CType(securitiesCodes(securitiesCode), String) + ".csv"
+            'ファイル削除
+            'System.IO.File.Delete(csvFile)
+
+            'csvファイル存在確認
+            If System.IO.File.Exists(csvFile) Then
+                '存在したら最終行(改行を含まず)のdate_positionの数値を取得
+                Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS") 'CSVファイルのエンコードを指定（今回はShift_JIS）
+                Dim lineCount As Integer = UBound(My.Computer.FileSystem.OpenTextFileReader(csvFile).ReadToEnd.Split(Chr(13)))
+                Dim srr As New System.IO.StreamReader(csvFile) '読み込むファイルを開く
+                Dim line, posi As String
+                line = srr.ReadLine()
+                For i As Integer = 1 To lineCount - 1
+                    line = srr.ReadLine()
+                Next i
+                srr.Close()
+                srr = Nothing
+
+                posi = CType(Right(line, 5).Replace("""", ""), Integer)
+
+                date_position = posi
+            Else
+                date_position = Prices.Begin() '5632?
+
+                'csvヘッダー表示
+                outputCsv(CType(securitiesCodes(securitiesCode), String) + " " + Prices.Name + ",,,,," + vbCrLf _
+                    + """date"",""open"",""hight"",""low"",""close"",""power"",""End"",""date_position""", csvFile)
+            End If
+
             Prices.Read(securitiesCodes(securitiesCode))
-            date_position = Prices.Begin() '5632?
             date_range = Prices.End - date_position
             Dim stock_array(date_range, 7) As String
 
@@ -71,14 +99,6 @@
 
             hash.Add(securitiesCodes(securitiesCode), Prices.Name)
 
-            csvFile = csvPath + CType(securitiesCodes(securitiesCode), String) + ".csv"
-
-            'ファイル削除
-            System.IO.File.Delete(csvFile)
-
-            'csvヘッダー表示
-            outputCsv(CType(securitiesCodes(securitiesCode), String) + " " + Prices.Name + ",,,,," + vbCrLf _
-                    + """date"",""open"",""hight"",""low"",""close"",""power"",""End"",""date_position""", csvFile)
 
             For i = 0 To date_range
                 If IsNothing(stock_array(i, 0)) Then

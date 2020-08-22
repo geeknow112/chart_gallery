@@ -7,7 +7,7 @@
         'getCmdParam()
 
         Dim securitiesCodes() As Integer = {
-            9101, 9104, 9107
+            9101
         }
 
         Dim Prices As New ActiveMarket.Prices

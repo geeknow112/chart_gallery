@@ -12,18 +12,40 @@
         Dim securitiesCodes() As Integer = {
             9101
         }
+        'Dim securitiesCodes() As Integer = {
+        '    9101, 9104, 9107, '海運業
+        '    4021, '日産化
+        '    4183, '三井化学
+        '    4005, '住友化
+        '    4188, '三菱ケミＨＤ
+        '    4911, '資生堂
+        '    3407, '旭化成
+        '    4042, '東ソー
+        '    6988, '日東電
+        '    3405, 'クラレ
+        '    4061, 'デンカ
+        '    4208, '宇部興
+        '    4272, '日化薬
+        '    4004, '昭電工
+        '    4631, 'ＤＩＣ
+        '    4043, 'トクヤマ
+        '    4901, '富士フイルム
+        '    4452, '花王
+        '    4063, '信越化
+        '    9984  'ソフトバンクグループ
+        '}
 
         Dim Prices As New ActiveMarket.Prices
         Dim Calendar As New ActiveMarket.Calendar
         Dim hash As New Hashtable
         Dim date_position As Integer
-        Dim date_range As Integer
+        Dim date_range, test As Integer
         Dim output As String
         Dim csvFile As String
 
         For securitiesCode = 0 To UBound(securitiesCodes)
             Prices.Read(securitiesCodes(securitiesCode))
-            date_position = 7900 'Price.Begin() '5632
+            date_position = Prices.Begin() '5632?
             date_range = Prices.End - date_position
             Dim stock_array(date_range, 7) As String
 
@@ -32,6 +54,7 @@
                 If Prices.IsClosed(date_position) Then
                     Continue For
                 End If
+
                 stock_array(i, 0) = Format(Calendar.Date(date_position), "yyyy-MM-dd")
                 stock_array(i, 1) = Prices.Open(date_position)
                 stock_array(i, 2) = Prices.High(date_position)
@@ -90,7 +113,7 @@
 
     Sub makeZip()
         'ZIP書庫を作成
-        'System.IO.Compression.ZipFile.CreateFromDirectory("C:\temp\test\dir", "C:\temp\test\1.zip", System.IO.Compression.CompressionLevel.Optimal, False, System.Text.Encoding.GetEncoding("shift_jis"))
+        System.IO.Compression.ZipFile.CreateFromDirectory("C:\temp\test\dir", "C:\temp\test\1.zip", System.IO.Compression.CompressionLevel.Optimal, False, System.Text.Encoding.GetEncoding("shift_jis"))
     End Sub
 
 End Module

@@ -134,9 +134,27 @@ Module Module1
                                         + ";Password=" + DB_Pw _
                                         + ";sqlservermode=True;")
             Conn.Open()
-            Dim query = "INSERT INTO test VALUES (2, 'test2')"
+            'data追加
+            'Dim query = "INSERT INTO test VALUES (2, 'test2')"
+            'Dim cmd As MySqlCommand = New MySqlCommand(query, Conn)
+            'cmd.ExecuteNonQuery()
+
+            'select
+            Dim query = "select * from stocks.s6326 limit 1"
             Dim cmd As MySqlCommand = New MySqlCommand(query, Conn)
-            cmd.ExecuteNonQuery()
+            Dim data As MySqlDataReader = cmd.ExecuteReader
+            '結果を表示
+            While data.Read()
+                Console.WriteLine(data("close"))
+            End While
+
+            Conn.Close()
+
+            Conn.Open()
+            Dim q = "insert into s6326 values ('1989-02-21','985','990','970','979','1957000','979','1');"
+            Dim c As MySqlCommand = New MySqlCommand(q, Conn)
+            c.ExecuteNonQuery()
+
             Conn.Close()
         End Using
     End Sub

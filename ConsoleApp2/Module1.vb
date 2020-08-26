@@ -6,7 +6,7 @@ Module Module1
     'ReadOnly csvPath As String = "C:\Users\r2d2\source\repos\chart_gallery\stock_data\"
 
     Sub Main()
-        'ConnectMySql()
+        ConnectMySql()
 
         'MakeZip()
         'Exit Sub
@@ -14,7 +14,7 @@ Module Module1
         'GetCmdParam()
 
         Dim securitiesCodes() As Integer = {
-            9101, 6326
+            9101, 9104, 9107, 6326
         }
 
         Dim Prices As New ActiveMarket.Prices
@@ -151,11 +151,72 @@ Module Module1
             Conn.Close()
 
             Conn.Open()
-            Dim q = "insert into s6326 values ('1989-02-21','985','990','970','979','1957000','979','1');"
-            Dim c As MySqlCommand = New MySqlCommand(q, Conn)
-            c.ExecuteNonQuery()
+            'Dim q = "insert into s6326 values ('1989-02-21','985','990','970','979','1957000','979','1');"
+            'Dim c As MySqlCommand = New MySqlCommand(q, Conn)
+            'c.ExecuteNonQuery()
 
+            'Dim q = "create table s9984 (id int not null auto_increment, date varchar(20) unique, open int, hight int, low int, close int, power int, End int, date_position int unique, rgdt timestamp, primary key(id)) comment='9984 SOFTBANK';"
+            'Dim c As MySqlCommand = New MySqlCommand(q, Conn)
+            'c.ExecuteNonQuery()
             Conn.Close()
+
+            Dim securitiesCodes() As Integer = {
+                9984, 4183
+            }
+
+            Dim Prices As New ActiveMarket.Prices
+            Dim Calendar As New ActiveMarket.Calendar
+            Dim hash As New Hashtable
+            Dim date_position As Integer
+            Dim date_range As Integer
+            Dim code As String
+
+            For securitiesCode = 0 To UBound(securitiesCodes)
+                Prices.Read(securitiesCodes(securitiesCode))
+                date_position = Prices.Begin() '5632?
+                date_range = Prices.End - date_position
+                Dim stock_array(date_range, 7) As String
+
+                For i = 0 To date_range - 1
+                    date_position = date_position + 1
+                    If Prices.IsClosed(date_position) Then
+                        Continue For
+                    End If
+
+                    stock_array(i, 0) = Format(Calendar.Date(date_position), "yyyy-MM-dd")
+                    stock_array(i, 1) = Math.Floor(Prices.Open(date_position))
+                    stock_array(i, 2) = Math.Floor(Prices.High(date_position))
+                    stock_array(i, 3) = Math.Floor(Prices.Low(date_position))
+                    stock_array(i, 4) = Math.Floor(Prices.Close(date_position))
+                    stock_array(i, 5) = Math.Floor(Prices.Volume(date_position) * 1000)
+                    stock_array(i, 6) = Math.Floor(Prices.Close(date_position))
+                    stock_array(i, 7) = date_position
+                Next
+
+                hash.Add(securitiesCodes(securitiesCode), Prices.Name)
+                code = securitiesCodes(securitiesCode).ToString
+                Conn.Open()
+                Dim q = "create table IF NOT EXISTS s" + code + " (id int not null auto_increment, date varchar(20) unique, open int, hight int, low int, close int, power int, End int, date_position int unique, rgdt timestamp, primary key(id)) comment='" + code + " " + Prices.Name + "';"
+                Dim c As MySqlCommand = New MySqlCommand(q, Conn)
+                c.ExecuteNonQuery()
+
+                Dim t = "truncate s" + code + ";"
+                Dim tr As MySqlCommand = New MySqlCommand(t, Conn)
+                tr.ExecuteNonQuery()
+
+                For i = 0 To date_range
+                    If IsNothing(stock_array(i, 0)) Then
+                        Continue For
+                    End If
+
+                    Dim ins = "insert into s" + code + " values (null, '" + stock_array(i, 0) + "','" + stock_array(i, 1) + "','" + stock_array(i, 2) + "','" + stock_array(i, 3) _
+                        + "','" + stock_array(i, 4) + "','" + stock_array(i, 5) + "','" + stock_array(i, 6) + "','" + stock_array(i, 7) + "', now());"
+
+                    Dim insert As MySqlCommand = New MySqlCommand(ins, Conn)
+                    insert.ExecuteNonQuery()
+                Next
+                Conn.Close()
+            Next
         End Using
     End Sub
 End Module

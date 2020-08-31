@@ -424,10 +424,18 @@ Module Module1
                 Dim cmd As MySqlCommand = New MySqlCommand(query, Conn)
                 Dim data As MySqlDataReader = cmd.ExecuteReader
                 Dim max_date As String
+                Dim insert_flug As Integer
+
                 '結果を表示
                 While data.Read()
                     'Console.WriteLine(data("close"))
-                    max_date = data("max_date")
+                    If IsDBNull(data("max_date")) Then
+                        max_date = Format(Now, "yyyy-MM-dd")
+                        insert_flug = 1
+                    Else
+                        max_date = data("max_date")
+                        insert_flug = 0
+                    End If
                 End While
                 Conn.Close()
                 Conn.Open()
@@ -447,6 +455,18 @@ Module Module1
                         Dim insert As MySqlCommand = New MySqlCommand(ins, Conn)
                         insert.ExecuteNonQuery()
                         Exit For
+                    End If
+
+                    If insert_flug = 1 Then
+                        i = i + 1
+                        If IsNothing(stock_array(i, 0)) Then
+                            Continue For
+                        End If
+                        Dim ins = "insert into s" + code + " values (null, '" + stock_array(i, 0) + "','" + stock_array(i, 1) + "','" + stock_array(i, 2) + "','" + stock_array(i, 3) _
+                        + "','" + stock_array(i, 4) + "','" + stock_array(i, 5) + "','" + stock_array(i, 6) + "', now());"
+
+                        Dim insert As MySqlCommand = New MySqlCommand(ins, Conn)
+                        insert.ExecuteNonQuery()
                     End If
                 Next
                 Conn.Close()

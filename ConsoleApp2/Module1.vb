@@ -1,7 +1,6 @@
 ﻿Module Module1
 
-    'Dim csvPath As String = "D:\Users\z112\source\repos\ConsoleApp2\stock_data\"
-    Dim csvPath As String = "C:\Users\r2d2\source\repos\chart_gallery\stock_data\"
+    Dim csvPath As String = "C:\Users\testUser\source\repos\chart_gallery\stock_data\"
 
     Sub Main()
         'makeZip()
